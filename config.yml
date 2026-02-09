@@ -1,0 +1,26 @@
+server:
+  applicationConnectors:
+    - type: http
+      port: 8080
+  adminConnectors:
+    - type: http
+      port: 8081
+
+database:
+  driverClass: com.mysql.cj.jdbc.Driver
+  user: root
+  password: password
+  url: jdbc:mysql://localhost:3306/pension_fund?useSSL=false&serverTimezone=UTC
+  validationQuery: SELECT 1
+  minSize: 1
+  maxSize: 10
+
+coroutines:
+  parallelism: 4
+  timeout: 30000
+  enableLogging: true
+
+logging:
+  level: INFO
+  loggers:
+    net.research.kt.coroutine: DEBUG

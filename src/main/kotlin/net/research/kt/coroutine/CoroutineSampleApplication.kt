@@ -10,6 +10,7 @@ import net.research.kt.coroutine.config.CoroutineSampleConfiguration
 import net.research.kt.coroutine.health.CoroutineHealthCheck
 import net.research.kt.coroutine.repository.*
 import net.research.kt.coroutine.service.BenefitSimulationService
+import org.jdbi.v3.core.Jdbi
 import org.slf4j.LoggerFactory
 
 /**
@@ -39,11 +40,15 @@ class CoroutineSampleApplication : Application<CoroutineSampleConfiguration>() {
     ) {
         logger.info("Starting Coroutine Sample Application")
 
+        // Initialize Jdbi
+        val jdbi = Jdbi.create(configuration.getDataSourceFactory().build(environment.metrics(), "mysql"))
+        logger.info("Initialized Jdbi with MySQL datasource")
+
         // Initialize repositories
-        val participantRepository = ParticipantRepository()
-        val contributionRepository = ContributionRepository()
-        val fundReturnRateRepository = FundReturnRateRepository()
-        val pensionRulesRepository = PensionRulesRepository()
+        val participantRepository = ParticipantRepository(jdbi)
+        val contributionRepository = ContributionRepository(jdbi)
+        val fundReturnRateRepository = FundReturnRateRepository(jdbi)
+        val pensionRulesRepository = PensionRulesRepository(jdbi)
 
         // Initialize services
         val simulationService = BenefitSimulationService(

@@ -1,56 +1,34 @@
 package net.research.kt.coroutine.repository
 
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
+import net.research.kt.coroutine.dao.ParticipantDao
 import net.research.kt.coroutine.domain.ParticipantProfile
+import org.jdbi.v3.core.Jdbi
 import org.slf4j.LoggerFactory
-import java.time.LocalDate
 
 /**
- * Repository for fetching participant profile information.
- * Simulates database/external service calls with delay.
+ * Repository for fetching participant profile information from MySQL database.
  */
-class ParticipantRepository {
+class ParticipantRepository(private val jdbi: Jdbi) {
 
     private val logger = LoggerFactory.getLogger(ParticipantRepository::class.java)
 
-    // In-memory data for demonstration
-    private val participants = mapOf(
-        "P001" to ParticipantProfile(
-            participantId = "P001",
-            name = "Budi Santoso",
-            birthDate = LocalDate.of(1980, 5, 15),
-            registrationDate = LocalDate.of(2005, 3, 1),
-            employerName = "PT Maju Jaya",
-            currentSalary = 15_000_000.0
-        ),
-        "P002" to ParticipantProfile(
-            participantId = "P002",
-            name = "Siti Nurhaliza",
-            birthDate = LocalDate.of(1985, 8, 22),
-            registrationDate = LocalDate.of(2010, 6, 15),
-            employerName = "PT Sejahtera Mandiri",
-            currentSalary = 12_000_000.0
-        ),
-        "P003" to ParticipantProfile(
-            participantId = "P003",
-            name = "Ahmad Dhani",
-            birthDate = LocalDate.of(1975, 3, 10),
-            registrationDate = LocalDate.of(2000, 1, 5),
-            employerName = "PT Karya Abadi",
-            currentSalary = 20_000_000.0
-        )
-    )
-
-    suspend fun findById(participantId: String): ParticipantProfile? {
+    suspend fun findById(participantId: String): ParticipantProfile? = withContext(Dispatchers.IO) {
         logger.info("Fetching participant profile for: $participantId")
-        // Simulate database call delay
+        // Simulate network/processing delay
         delay(150)
-        return participants[participantId]
+        jdbi.withExtension<ParticipantProfile?, ParticipantDao, Exception>(ParticipantDao::class.java) { dao ->
+            dao.findById(participantId)
+        }
     }
 
-    suspend fun findAll(): List<ParticipantProfile> {
+    suspend fun findAll(): List<ParticipantProfile> = withContext(Dispatchers.IO) {
         logger.info("Fetching all participants")
         delay(200)
-        return participants.values.toList()
+        jdbi.withExtension<List<ParticipantProfile>, ParticipantDao, Exception>(ParticipantDao::class.java) { dao ->
+            dao.findAll()
+        }
     }
 }

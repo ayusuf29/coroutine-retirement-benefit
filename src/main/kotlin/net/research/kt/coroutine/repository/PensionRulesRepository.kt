@@ -1,29 +1,27 @@
 package net.research.kt.coroutine.repository
 
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
+import net.research.kt.coroutine.dao.PensionRulesDao
 import net.research.kt.coroutine.domain.PensionRules
+import org.jdbi.v3.core.Jdbi
 import org.slf4j.LoggerFactory
 
 /**
- * Repository for fetching pension rules and regulations.
- * Simulates configuration/rules service calls with delay.
+ * Repository for fetching pension rules from MySQL database.
  */
-class PensionRulesRepository {
+class PensionRulesRepository(private val jdbi: Jdbi) {
 
     private val logger = LoggerFactory.getLogger(PensionRulesRepository::class.java)
 
-    private val currentRules = PensionRules(
-        normalRetirementAge = 58,
-        earlyRetirementAge = 50,
-        minimumYearsOfService = 5,
-        earlyRetirementPenaltyRate = 0.05,
-        monthlyBenefitDivisor = 180
-    )
-
-    suspend fun getCurrentRules(): PensionRules {
+    suspend fun getCurrentRules(): PensionRules = withContext(Dispatchers.IO) {
         logger.info("Fetching current pension rules")
         // Simulate configuration service delay
         delay(80)
-        return currentRules
+
+        jdbi.withExtension<PensionRules, PensionRulesDao, Exception>(PensionRulesDao::class.java) { dao ->
+            dao.getCurrentRules() ?: PensionRules()
+        }
     }
 }
