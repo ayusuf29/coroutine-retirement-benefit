@@ -16,9 +16,14 @@ class CoroutineSampleConfiguration : Configuration() {
     @JsonProperty("coroutines")
     private val coroutineConfig: CoroutineConfiguration = CoroutineConfiguration()
 
+    @JsonProperty("kafka")
+    private val kafkaConfig: KafkaConfiguration = KafkaConfiguration()
+
     fun getDataSourceFactory(): DataSourceFactory = dataSourceFactory
 
     fun getCoroutineConfig(): CoroutineConfiguration = coroutineConfig
+
+    fun getKafkaConfig(): KafkaConfiguration = kafkaConfig
 }
 
 data class CoroutineConfiguration(
@@ -30,4 +35,27 @@ data class CoroutineConfiguration(
 
     @JsonProperty("enableLogging")
     val enableLogging: Boolean = true
+)
+
+data class KafkaConfiguration(
+    @JsonProperty("bootstrapServers")
+    val bootstrapServers: String = "localhost:9092",
+
+    @JsonProperty("topic")
+    val topic: String = "pension-simulation-events",
+
+    @JsonProperty("clientId")
+    val clientId: String = "pension-simulation-producer",
+
+    @JsonProperty("retries")
+    val retries: Int = 3,
+
+    @JsonProperty("acks")
+    val acks: String = "all",
+
+    @JsonProperty("enableIdempotence")
+    val enableIdempotence: Boolean = true,
+
+    @JsonProperty("compressionType")
+    val compressionType: String = "snappy"
 )

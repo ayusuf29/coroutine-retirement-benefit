@@ -20,7 +20,17 @@ coroutines:
   timeout: 30000
   enableLogging: true
 
+kafka:
+  bootstrapServers: localhost:9092
+  topic: pension-simulation-events
+  clientId: pension-simulation-producer
+  retries: 3
+  acks: all
+  enableIdempotence: true
+  compressionType: snappy
+
 logging:
   level: INFO
   loggers:
     net.research.kt.coroutine: DEBUG
+    org.apache.kafka: WARN

@@ -8,6 +8,8 @@ import net.research.kt.coroutine.api.BenefitSimulationResource
 import net.research.kt.coroutine.api.HealthCheckResource
 import net.research.kt.coroutine.config.CoroutineSampleConfiguration
 import net.research.kt.coroutine.health.CoroutineHealthCheck
+import net.research.kt.coroutine.kafka.EventPublisher
+import net.research.kt.coroutine.kafka.KafkaProducerFactory
 import net.research.kt.coroutine.repository.*
 import net.research.kt.coroutine.service.BenefitSimulationService
 import org.jdbi.v3.core.Jdbi
@@ -60,8 +62,37 @@ class CoroutineSampleApplication : Application<CoroutineSampleConfiguration>() {
             timeoutMillis = configuration.getCoroutineConfig().timeoutMillis
         )
 
+        // Initialize Kafka (optional - graceful degradation if Kafka is not available)
+        val eventPublisher = try {
+            val kafkaProducerFactory = KafkaProducerFactory(
+                configuration.getKafkaConfig(),
+                environment.objectMapper
+            )
+            val producer = kafkaProducerFactory.createProducer()
+            val publisher = EventPublisher(
+                producer,
+                configuration.getKafkaConfig(),
+                environment.objectMapper
+            )
+            logger.info("Kafka event publisher initialized successfully")
+            
+            // Register shutdown hook to close Kafka producer gracefully
+            environment.lifecycle().manage(object : io.dropwizard.lifecycle.Managed {
+                override fun start() {}
+                override fun stop() {
+                    logger.info("Shutting down Kafka producer")
+                    publisher.close()
+                }
+            })
+            
+            publisher
+        } catch (e: Exception) {
+            logger.warn("Failed to initialize Kafka event publisher: ${e.message}. Async endpoints will not be available.")
+            null
+        }
+
         // Register resources
-        environment.jersey().register(BenefitSimulationResource(simulationService))
+        environment.jersey().register(BenefitSimulationResource(simulationService, eventPublisher))
         environment.jersey().register(HealthCheckResource())
         logger.info("Registered REST resources")
 

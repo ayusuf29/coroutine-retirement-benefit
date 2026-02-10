@@ -52,6 +52,9 @@ dependencies {
     // Validation
     implementation("jakarta.validation:jakarta.validation-api:3.0.2")
 
+    // Kafka - Event-Driven Architecture
+    implementation("org.apache.kafka:kafka-clients:3.6.1")
+
     // Testing
     testImplementation("io.dropwizard:dropwizard-testing:4.0.6")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.0")
