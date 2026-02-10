@@ -42,6 +42,7 @@ class CoroutineSampleApplication : Application<CoroutineSampleConfiguration>() {
 
         // Initialize Jdbi
         val jdbi = Jdbi.create(configuration.getDataSourceFactory().build(environment.metrics(), "mysql"))
+        jdbi.installPlugin(org.jdbi.v3.sqlobject.SqlObjectPlugin())
         logger.info("Initialized Jdbi with MySQL datasource")
 
         // Initialize repositories

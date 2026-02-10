@@ -1,6 +1,7 @@
 package net.research.kt.coroutine.dao
 
 import net.research.kt.coroutine.domain.FundReturnRate
+import org.jdbi.v3.sqlobject.customizer.Bind
 import org.jdbi.v3.sqlobject.statement.SqlQuery
 import org.jdbi.v3.sqlobject.kotlin.RegisterKotlinMapper
 
@@ -20,5 +21,5 @@ interface FundReturnRateDao {
         ORDER BY year DESC
         LIMIT :limit
     """)
-    fun findRecent(limit: Int): List<FundReturnRate>
+    fun findRecent(@Bind("limit") limit: Int): List<FundReturnRate>
 }

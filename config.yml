@@ -8,9 +8,9 @@ server:
 
 database:
   driverClass: com.mysql.cj.jdbc.Driver
-  user: root
+  user: pension_user
   password: password
-  url: jdbc:mysql://localhost:3306/pension_fund?useSSL=false&serverTimezone=UTC
+  url: jdbc:mysql://localhost:3306/pension_fund?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
   validationQuery: SELECT 1
   minSize: 1
   maxSize: 10

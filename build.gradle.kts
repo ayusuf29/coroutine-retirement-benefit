@@ -1,6 +1,17 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("com.mysql:mysql-connector-j:8.3.0")
+        classpath("org.flywaydb:flyway-mysql:10.8.1")
+    }
+}
+
 plugins {
     kotlin("jvm") version "1.9.22"
     application
+    id("org.flywaydb.flyway") version "10.10.0"
 }
 
 group = "net.research.kt.coroutine"
@@ -69,4 +80,12 @@ tasks {
 java {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
+}
+
+flyway {
+    url = "jdbc:mysql://localhost:3306/pension_fund?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true"
+    user = "pension_user"
+    password = "password"
+    locations = arrayOf("filesystem:src/main/resources/db/migration")
+    cleanDisabled = false
 }
